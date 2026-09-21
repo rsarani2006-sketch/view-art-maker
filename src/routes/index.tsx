@@ -80,7 +80,7 @@ function Index() {
     [query, genre, language],
   );
 
-  const featured = movies[0];
+  const featured = movies[0]!;
 
   return (
     <div className="min-h-screen">

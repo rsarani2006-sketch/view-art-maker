@@ -6,7 +6,7 @@ export const STANDARD_PRICE = 250;
 export const PREMIUM_PRICE = 420;
 
 export const seatPrice = (seatId: string) =>
-  PREMIUM_ROWS.includes(seatId[0]) ? PREMIUM_PRICE : STANDARD_PRICE;
+  PREMIUM_ROWS.includes(seatId.charAt(0)) ? PREMIUM_PRICE : STANDARD_PRICE;
 
 const hash = (value: string) => {
   let h = 2166136261;
