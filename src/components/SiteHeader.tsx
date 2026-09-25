@@ -1,6 +1,28 @@
-import { Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "@tanstack/react-router";
+import type { User } from "@supabase/supabase-js";
+
+import { supabase } from "@/integrations/supabase/client";
 
 export function SiteHeader() {
+  const navigate = useNavigate();
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => setUser(data.user));
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    navigate({ to: "/", replace: true });
+  };
+
   return (
     <header className="sticky top-0 z-30 border-b border-border/60 bg-background/85 backdrop-blur">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
@@ -25,6 +47,22 @@ export function SiteHeader() {
           >
             My bookings
           </Link>
+          {user ? (
+            <button
+              type="button"
+              onClick={handleSignOut}
+              className="ml-1 rounded-md border border-border px-3 py-2 font-semibold text-foreground transition-colors hover:bg-accent"
+            >
+              Sign out
+            </button>
+          ) : (
+            <Link
+              to="/auth"
+              className="ml-1 rounded-md bg-primary px-3 py-2 font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
+            >
+              Sign in
+            </Link>
+          )}
         </nav>
       </div>
     </header>
