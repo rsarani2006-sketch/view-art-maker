@@ -13,6 +13,7 @@ import {
   soldSeatsFor,
 } from "@/lib/seats";
 import { bookedSeatsFor, saveBooking } from "@/lib/bookings";
+import { DemoPayment } from "@/components/DemoPayment";
 
 export const Route = createFileRoute("/book/$showtimeId")({
   loader: ({ params }) => {
@@ -42,6 +43,7 @@ function BookSeats() {
   const { showtime, movie } = Route.useLoaderData();
   const navigate = useNavigate();
   const [selected, setSelected] = useState<string[]>([]);
+  const [paying, setPaying] = useState(false);
   const [taken, setTaken] = useState<Set<string>>(() => soldSeatsFor(showtime.id));
 
   useEffect(() => {
@@ -67,6 +69,10 @@ function BookSeats() {
 
   const confirm = () => {
     if (selected.length === 0) return;
+    setPaying(true);
+  };
+
+  const completeBooking = () => {
     saveBooking({
       id: `${showtime.id}-${Date.now()}`,
       movieId: movie.id,
@@ -172,9 +178,12 @@ function BookSeats() {
             disabled={selected.length === 0}
             className="rounded-lg bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-40"
           >
-            Confirm booking
+            Proceed to pay
           </button>
         </div>
+        {paying && (
+          <DemoPayment total={total} onPaid={completeBooking} onCancel={() => setPaying(false)} />
+        )}
       </div>
     </div>
   );
